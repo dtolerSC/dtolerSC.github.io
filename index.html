@@ -1,0 +1,35 @@
+ <!DOCTYPE html>
+<html>
+<head>
+<style>
+body {background-color: powderblue;}
+h1   {color: blue;}
+p    {color: red;}
+</style>
+
+<script>
+	function calculate(){
+		var in_oxA = 1
+		var eff_tA = parseFloat(document.getElementById('a').value, 10);
+		var eff_tB = parseFloat(document.getElementById('b').value, 10);
+		var eff_tX = parseFloat(document.getElementById('x').value, 10);
+		
+		var tmp_ratio1 = eff_tA/eff_tB
+		var tmp_ratio2 = eff_tX/eff_tB
+		var tmp_tau = tmp_ratio2-in_oxA*(in_oxA-(tmp_ratio1/Math.log(tmp_ratio1)))
+		
+		return tmp_tau;
+	}
+</script>
+
+</head>
+<body>
+A<input type="number" id="a" value="70"><br>
+B<input type="number" id="b" value="65"><br>
+X<input type="number" id="x" value="60"><br>
+<button type="button" onclick="document.getElementById('output').innerHTML = calculate()">Run</button>
+<br><br>
+Result
+<p id="output"></p>
+</body>
+</html> 
