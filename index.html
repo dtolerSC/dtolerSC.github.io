@@ -1,35 +1,726 @@
- <!DOCTYPE html>
+
+<!DOCTYPE html>
 <html>
 <head>
 <style>
-body {background-color: powderblue;}
-h1   {color: blue;}
-p    {color: red;}
+body {background-color: #73000a;}
+h1	{color:blue;}
+p	{color:black;}
 </style>
+</head>
 
+<body>
 <script>
-	function calculate(){
-		var in_oxA = 1
-		var eff_tA = parseFloat(document.getElementById('a').value, 10);
-		var eff_tB = parseFloat(document.getElementById('b').value, 10);
-		var eff_tX = parseFloat(document.getElementById('x').value, 10);
-		
-		var tmp_ratio1 = eff_tA/eff_tB
-		var tmp_ratio2 = eff_tX/eff_tB
-		var tmp_tau = tmp_ratio2-in_oxA*(in_oxA-(tmp_ratio1/Math.log(tmp_ratio1)))
-		
-		return tmp_tau;
+	let element_names = [
+		"K","Nb","Ca","Cm","Sb","Au","I","Mo","Ba","Pa","Ce","P","Sr",
+		"La","Tl","Pu","Hf","Cl","Sm","Nd","Nh","U","Eu","Rb","Th","Ga",
+		"Ru","Cr","Ac","Xe","Po","Be","N","Tc","Sn","Cs","Al","O",
+		"Ho","Yb","Pt","Ge","Cd","Ni","Bi","Ta","H","Os","Rh","S",
+		"Y","Fe","V","Ra","Co","Ir","In","C","No","Np","F","Li",
+		"Lu","Se","Gd","Br","Mg","Ti","Mn","Zr","Tb","Pr","Sc","B",
+		"Am","Bk","Re","Te","Pm","As","Pd","Si","W","Cf","Ag","Tm",
+		"At","Dy","Zn","Na","Hg","D","Cu","Pb","Er"
+	]
+
+
+	let elements = [
+		{name:"K",oxidation:1,coor:4,only_spin:1.37},
+		{name:"K",oxidation:1,coor:6,only_spin:1.38},
+		{name:"K",oxidation:1,coor:7,only_spin:1.46},
+		{name:"K",oxidation:1,coor:8,only_spin:1.51},
+		{name:"K",oxidation:1,coor:9,only_spin:1.55},
+		{name:"K",oxidation:1,coor:10,only_spin:1.59},
+		{name:"K",oxidation:1,coor:12,only_spin:1.64},
+		{name:"Nb",oxidation:3,coor:6,only_spin:0.72},
+		{name:"Nb",oxidation:4,coor:8,only_spin:0.79},
+		{name:"Nb",oxidation:4,coor:6,only_spin:0.68},
+		{name:"Nb",oxidation:5,coor:8,only_spin:0.74},
+		{name:"Nb",oxidation:5,coor:4,only_spin:0.48},
+		{name:"Nb",oxidation:5,coor:6,only_spin:0.64},
+		{name:"Nb",oxidation:5,coor:7,only_spin:0.69},
+		{name:"Ca",oxidation:2,coor:6,only_spin:1},
+		{name:"Ca",oxidation:2,coor:7,only_spin:1.06},
+		{name:"Ca",oxidation:2,coor:8,only_spin:1.12},
+		{name:"Ca",oxidation:2,coor:9,only_spin:1.18},
+		{name:"Ca",oxidation:2,coor:10,only_spin:1.23},
+		{name:"Ca",oxidation:2,coor:12,only_spin:1.34},
+		{name:"Cm",oxidation:3,coor:4,only_spin:0.97},
+		{name:"Cm",oxidation:4,coor:8,only_spin:0.95},
+		{name:"Cm",oxidation:4,coor:4,only_spin:0.85},
+		{name:"Sb",oxidation:3,coor:4,only_spin:0.74},
+		{name:"Sb",oxidation:3,coor:5,only_spin:0.8},
+		{name:"Sb",oxidation:3,coor:6,only_spin:0.76},
+		{name:"Sb",oxidation:5,coor:6,only_spin:0.6},
+		{name:"Au",oxidation:1,coor:6,only_spin:1.37},
+		{name:"Au",oxidation:3,coor:4,only_spin:0.68},
+		{name:"Au",oxidation:3,coor:6,only_spin:0.85},
+		{name:"Au",oxidation:5,coor:6,only_spin:0.57},
+		{name:"I",oxidation:5,coor:3,only_spin:0.44},
+		{name:"I",oxidation:5,coor:6,only_spin:0.95},
+		{name:"I",oxidation:-1,coor:6,only_spin:2.2},
+		{name:"I",oxidation:7,coor:4,only_spin:0.42},
+		{name:"I",oxidation:7,coor:6,only_spin:0.53},
+		{name:"Mo",oxidation:3,coor:6,only_spin:0.69},
+		{name:"Mo",oxidation:4,coor:6,only_spin:0.65},
+		{name:"Mo",oxidation:5,coor:4,only_spin:0.46},
+		{name:"Mo",oxidation:5,coor:6,only_spin:0.61},
+		{name:"Mo",oxidation:6,coor:4,only_spin:0.41},
+		{name:"Mo",oxidation:6,coor:5,only_spin:0.5},
+		{name:"Mo",oxidation:6,coor:6,only_spin:0.59},
+		{name:"Mo",oxidation:6,coor:7,only_spin:0.73},
+		{name:"Ba",oxidation:2,coor:6,only_spin:1.35},
+		{name:"Ba",oxidation:2,coor:7,only_spin:1.38},
+		{name:"Ba",oxidation:2,coor:8,only_spin:1.42},
+		{name:"Ba",oxidation:2,coor:9,only_spin:1.47},
+		{name:"Ba",oxidation:2,coor:10,only_spin:1.52},
+		{name:"Ba",oxidation:2,coor:11,only_spin:1.57},
+		{name:"Ba",oxidation:2,coor:12,only_spin:1.61},
+		{name:"Pa",oxidation:3,coor:6,only_spin:1.04},
+		{name:"Pa",oxidation:4,coor:8,only_spin:1.01},
+		{name:"Pa",oxidation:4,coor:6,only_spin:0.9},
+		{name:"Pa",oxidation:5,coor:8,only_spin:0.91},
+		{name:"Pa",oxidation:5,coor:9,only_spin:0.95},
+		{name:"Pa",oxidation:5,coor:6,only_spin:0.78},
+		{name:"Ce",oxidation:3,coor:6,only_spin:1.01},
+		{name:"Ce",oxidation:3,coor:7,only_spin:1.07},
+		{name:"Ce",oxidation:3,coor:8,only_spin:1.143},
+		{name:"Ce",oxidation:3,coor:9,only_spin:1.196},
+		{name:"Ce",oxidation:3,coor:10,only_spin:1.25},
+		{name:"Ce",oxidation:3,coor:12,only_spin:1.34},
+		{name:"Ce",oxidation:4,coor:8,only_spin:0.97},
+		{name:"Ce",oxidation:4,coor:10,only_spin:1.07},
+		{name:"Ce",oxidation:4,coor:12,only_spin:1.14},
+		{name:"Ce",oxidation:4,coor:6,only_spin:0.87},
+		{name:"P",oxidation:3,coor:6,only_spin:0.44},
+		{name:"P",oxidation:5,coor:4,only_spin:0.17},
+		{name:"P",oxidation:5,coor:5,only_spin:0.29},
+		{name:"P",oxidation:5,coor:6,only_spin:0.38},
+		{name:"Sr",oxidation:2,coor:6,only_spin:1.18},
+		{name:"Sr",oxidation:2,coor:7,only_spin:1.21},
+		{name:"Sr",oxidation:2,coor:8,only_spin:1.26},
+		{name:"Sr",oxidation:2,coor:9,only_spin:1.31},
+		{name:"Sr",oxidation:2,coor:10,only_spin:1.36},
+		{name:"Sr",oxidation:2,coor:12,only_spin:1.44},
+		{name:"La",oxidation:3,coor:6,only_spin:1.032},
+		{name:"La",oxidation:3,coor:7,only_spin:1.1},
+		{name:"La",oxidation:3,coor:8,only_spin:1.16},
+		{name:"La",oxidation:3,coor:9,only_spin:1.216},
+		{name:"La",oxidation:3,coor:10,only_spin:1.27},
+		{name:"La",oxidation:3,coor:12,only_spin:1.36},
+		{name:"Tl",oxidation:1,coor:8,only_spin:1.59},
+		{name:"Tl",oxidation:1,coor:12,only_spin:1.7},
+		{name:"Tl",oxidation:1,coor:6,only_spin:1.5},
+		{name:"Tl",oxidation:3,coor:8,only_spin:0.98},
+		{name:"Tl",oxidation:3,coor:4,only_spin:0.75},
+		{name:"Tl",oxidation:3,coor:6,only_spin:0.885},
+		{name:"Pu",oxidation:3,coor:6,only_spin:1},
+		{name:"Pu",oxidation:4,coor:8,only_spin:0.96},
+		{name:"Pu",oxidation:4,coor:6,only_spin:0.86},
+		{name:"Pu",oxidation:5,coor:6,only_spin:0.74},
+		{name:"Pu",oxidation:6,coor:6,only_spin:0.71},
+		{name:"Hf",oxidation:4,coor:8,only_spin:0.83},
+		{name:"Hf",oxidation:4,coor:4,only_spin:0.58},
+		{name:"Hf",oxidation:4,coor:6,only_spin:0.71},
+		{name:"Hf",oxidation:4,coor:7,only_spin:0.76},
+		{name:"Cl",oxidation:5,coor:3,only_spin:0.12},
+		{name:"Cl",oxidation:-1,coor:6,only_spin:1.81},
+		{name:"Cl",oxidation:7,coor:4,only_spin:0.08},
+		{name:"Cl",oxidation:7,coor:6,only_spin:0.27},
+		{name:"Sm",oxidation:2,coor:8,only_spin:1.27},
+		{name:"Sm",oxidation:2,coor:9,only_spin:1.32},
+		{name:"Sm",oxidation:2,coor:7,only_spin:1.22},
+		{name:"Sm",oxidation:3,coor:8,only_spin:1.079},
+		{name:"Sm",oxidation:3,coor:9,only_spin:1.132},
+		{name:"Sm",oxidation:3,coor:12,only_spin:1.24},
+		{name:"Sm",oxidation:3,coor:6,only_spin:0.958},
+		{name:"Sm",oxidation:3,coor:7,only_spin:1.02},
+		{name:"Nd",oxidation:2,coor:8,only_spin:1.29},
+		{name:"Nd",oxidation:2,coor:9,only_spin:1.35},
+		{name:"Nd",oxidation:3,coor:8,only_spin:1.109},
+		{name:"Nd",oxidation:3,coor:9,only_spin:1.163},
+		{name:"Nd",oxidation:3,coor:12,only_spin:1.27},
+		{name:"Nd",oxidation:3,coor:6,only_spin:0.983},
+		{name:"Nh",oxidation:1,coor:6,only_spin:1.46},
+		{name:"U",oxidation:3,coor:6,only_spin:1.025},
+		{name:"U",oxidation:4,coor:8,only_spin:1},
+		{name:"U",oxidation:4,coor:9,only_spin:1.05},
+		{name:"U",oxidation:4,coor:12,only_spin:1.17},
+		{name:"U",oxidation:4,coor:6,only_spin:0.89},
+		{name:"U",oxidation:4,coor:7,only_spin:0.95},
+		{name:"U",oxidation:5,coor:6,only_spin:0.76},
+		{name:"U",oxidation:5,coor:7,only_spin:0.84},
+		{name:"U",oxidation:6,coor:8,only_spin:0.86},
+		{name:"U",oxidation:6,coor:2,only_spin:0.45},
+		{name:"U",oxidation:6,coor:4,only_spin:0.52},
+		{name:"U",oxidation:6,coor:6,only_spin:0.73},
+		{name:"U",oxidation:6,coor:7,only_spin:0.81},
+		{name:"Eu",oxidation:2,coor:8,only_spin:1.25},
+		{name:"Eu",oxidation:2,coor:9,only_spin:1.3},
+		{name:"Eu",oxidation:2,coor:10,only_spin:1.35},
+		{name:"Eu",oxidation:2,coor:6,only_spin:1.17},
+		{name:"Eu",oxidation:2,coor:7,only_spin:1.2},
+		{name:"Eu",oxidation:3,coor:8,only_spin:1.066},
+		{name:"Eu",oxidation:3,coor:9,only_spin:1.12},
+		{name:"Eu",oxidation:3,coor:6,only_spin:0.947},
+		{name:"Eu",oxidation:3,coor:7,only_spin:1.01},
+		{name:"Rb",oxidation:1,coor:6,only_spin:1.52},
+		{name:"Rb",oxidation:1,coor:7,only_spin:1.56},
+		{name:"Rb",oxidation:1,coor:8,only_spin:1.61},
+		{name:"Rb",oxidation:1,coor:9,only_spin:1.63},
+		{name:"Rb",oxidation:1,coor:10,only_spin:1.66},
+		{name:"Rb",oxidation:1,coor:11,only_spin:1.69},
+		{name:"Rb",oxidation:1,coor:12,only_spin:1.72},
+		{name:"Rb",oxidation:1,coor:14,only_spin:1.83},
+		{name:"Th",oxidation:4,coor:6,only_spin:0.94},
+		{name:"Th",oxidation:4,coor:8,only_spin:1.05},
+		{name:"Th",oxidation:4,coor:9,only_spin:1.09},
+		{name:"Th",oxidation:4,coor:10,only_spin:1.13},
+		{name:"Th",oxidation:4,coor:11,only_spin:1.18},
+		{name:"Th",oxidation:4,coor:12,only_spin:1.21},
+		{name:"Ga",oxidation:3,coor:4,only_spin:0.47},
+		{name:"Ga",oxidation:3,coor:5,only_spin:0.55},
+		{name:"Ga",oxidation:3,coor:6,only_spin:0.62},
+		{name:"Ru",oxidation:8,coor:4,only_spin:0.36},
+		{name:"Ru",oxidation:3,coor:6,only_spin:0.68},
+		{name:"Ru",oxidation:4,coor:6,only_spin:0.62},
+		{name:"Ru",oxidation:5,coor:6,only_spin:0.565},
+		{name:"Ru",oxidation:7,coor:4,only_spin:0.38},
+		{name:"Cr",oxidation:2,coor:6,only_spin:0.8},
+		{name:"Cr",oxidation:3,coor:6,only_spin:0.615},
+		{name:"Cr",oxidation:4,coor:4,only_spin:0.41},
+		{name:"Cr",oxidation:4,coor:6,only_spin:0.55},
+		{name:"Cr",oxidation:5,coor:8,only_spin:0.57},
+		{name:"Cr",oxidation:5,coor:4,only_spin:0.345},
+		{name:"Cr",oxidation:5,coor:6,only_spin:0.49},
+		{name:"Cr",oxidation:6,coor:4,only_spin:0.26},
+		{name:"Cr",oxidation:6,coor:6,only_spin:0.44},
+		{name:"Ac",oxidation:3,coor:6,only_spin:1.12},
+		{name:"Xe",oxidation:8,coor:4,only_spin:0.4},
+		{name:"Xe",oxidation:8,coor:6,only_spin:0.48},
+		{name:"Po",oxidation:4,coor:8,only_spin:1.08},
+		{name:"Po",oxidation:4,coor:6,only_spin:0.94},
+		{name:"Po",oxidation:6,coor:6,only_spin:0.67},
+		{name:"Be",oxidation:2,coor:3,only_spin:0.16},
+		{name:"Be",oxidation:2,coor:4,only_spin:0.27},
+		{name:"Be",oxidation:2,coor:6,only_spin:0.45},
+		{name:"N",oxidation:3,coor:6,only_spin:0.16},
+		{name:"N",oxidation:5,coor:3,only_spin:-0.104},
+		{name:"N",oxidation:5,coor:4,only_spin:0.13},
+		{name:"N",oxidation:-3,coor:4,only_spin:1.46},
+		{name:"Tc",oxidation:4,coor:6,only_spin:0.645},
+		{name:"Tc",oxidation:5,coor:6,only_spin:0.6},
+		{name:"Tc",oxidation:7,coor:4,only_spin:0.37},
+		{name:"Tc",oxidation:7,coor:6,only_spin:0.56},
+		{name:"Sn",oxidation:2,coor:6,only_spin:1.15},
+		{name:"Sn",oxidation:4,coor:8,only_spin:0.81},
+		{name:"Sn",oxidation:4,coor:4,only_spin:0.55},
+		{name:"Sn",oxidation:4,coor:5,only_spin:0.62},
+		{name:"Sn",oxidation:4,coor:6,only_spin:0.69},
+		{name:"Sn",oxidation:4,coor:7,only_spin:0.75},
+		{name:"Cs",oxidation:1,coor:6,only_spin:1.67},
+		{name:"Cs",oxidation:1,coor:8,only_spin:1.74},
+		{name:"Cs",oxidation:1,coor:9,only_spin:1.78},
+		{name:"Cs",oxidation:1,coor:10,only_spin:1.81},
+		{name:"Cs",oxidation:1,coor:11,only_spin:1.85},
+		{name:"Cs",oxidation:1,coor:12,only_spin:1.88},
+		{name:"Al",oxidation:3,coor:4,only_spin:0.39},
+		{name:"Al",oxidation:3,coor:5,only_spin:0.48},
+		{name:"Al",oxidation:3,coor:6,only_spin:0.535},
+		{name:"O",oxidation:-2,coor:8,only_spin:1.42},
+		{name:"O",oxidation:-2,coor:2,only_spin:1.35},
+		{name:"O",oxidation:-2,coor:3,only_spin:1.36},
+		{name:"O",oxidation:-2,coor:4,only_spin:1.38},
+		{name:"O",oxidation:-2,coor:6,only_spin:1.4},
+		{name:"Ho",oxidation:3,coor:8,only_spin:1.015},
+		{name:"Ho",oxidation:3,coor:9,only_spin:1.072},
+		{name:"Ho",oxidation:3,coor:10,only_spin:1.12},
+		{name:"Ho",oxidation:3,coor:6,only_spin:0.901},
+		{name:"Yb",oxidation:2,coor:8,only_spin:1.14},
+		{name:"Yb",oxidation:2,coor:6,only_spin:1.02},
+		{name:"Yb",oxidation:2,coor:7,only_spin:1.08},
+		{name:"Yb",oxidation:3,coor:8,only_spin:0.985},
+		{name:"Yb",oxidation:3,coor:9,only_spin:1.042},
+		{name:"Yb",oxidation:3,coor:6,only_spin:0.868},
+		{name:"Yb",oxidation:3,coor:7,only_spin:0.925},
+		{name:"Pt",oxidation:2,coor:4,only_spin:0.6},
+		{name:"Pt",oxidation:2,coor:6,only_spin:0.8},
+		{name:"Pt",oxidation:4,coor:6,only_spin:0.625},
+		{name:"Pt",oxidation:5,coor:6,only_spin:0.57},
+		{name:"Ge",oxidation:2,coor:6,only_spin:0.73},
+		{name:"Ge",oxidation:4,coor:4,only_spin:0.39},
+		{name:"Ge",oxidation:4,coor:6,only_spin:0.53},
+		{name:"Cd",oxidation:2,coor:4,only_spin:0.78},
+		{name:"Cd",oxidation:2,coor:5,only_spin:0.87},
+		{name:"Cd",oxidation:2,coor:6,only_spin:0.95},
+		{name:"Cd",oxidation:2,coor:7,only_spin:1.03},
+		{name:"Cd",oxidation:2,coor:8,only_spin:1.1},
+		{name:"Cd",oxidation:2,coor:12,only_spin:1.31},
+		{name:"Ni",oxidation:2,coor:4,only_spin:0.55},
+		{name:"Ni",oxidation:2,coor:5,only_spin:0.63},
+		{name:"Ni",oxidation:2,coor:6,only_spin:0.69},
+		{name:"Ni",oxidation:3,coor:6,only_spin:0.6},
+		{name:"Ni",oxidation:4,coor:6,only_spin:0.48},
+		{name:"Bi",oxidation:3,coor:8,only_spin:1.17},
+		{name:"Bi",oxidation:3,coor:5,only_spin:0.96},
+		{name:"Bi",oxidation:3,coor:6,only_spin:1.03},
+		{name:"Bi",oxidation:5,coor:6,only_spin:0.76},
+		{name:"Ta",oxidation:3,coor:6,only_spin:0.72},
+		{name:"Ta",oxidation:4,coor:6,only_spin:0.68},
+		{name:"Ta",oxidation:5,coor:8,only_spin:0.74},
+		{name:"Ta",oxidation:5,coor:6,only_spin:0.64},
+		{name:"Ta",oxidation:5,coor:7,only_spin:0.69},
+		{name:"H",oxidation:1,coor:1,only_spin:-0.38},
+		{name:"H",oxidation:1,coor:2,only_spin:-0.18},
+		{name:"Os",oxidation:8,coor:4,only_spin:0.39},
+		{name:"Os",oxidation:4,coor:6,only_spin:0.63},
+		{name:"Os",oxidation:5,coor:6,only_spin:0.575},
+		{name:"Os",oxidation:6,coor:5,only_spin:0.49},
+		{name:"Os",oxidation:6,coor:6,only_spin:0.545},
+		{name:"Os",oxidation:7,coor:6,only_spin:0.525},
+		{name:"Rh",oxidation:3,coor:6,only_spin:0.665},
+		{name:"Rh",oxidation:4,coor:6,only_spin:0.6},
+		{name:"Rh",oxidation:5,coor:6,only_spin:0.55},
+		{name:"S",oxidation:4,coor:6,only_spin:0.37},
+		{name:"S",oxidation:6,coor:4,only_spin:0.12},
+		{name:"S",oxidation:6,coor:6,only_spin:0.29},
+		{name:"S",oxidation:-2,coor:6,only_spin:1.84},
+		{name:"Y",oxidation:3,coor:8,only_spin:1.019},
+		{name:"Y",oxidation:3,coor:9,only_spin:1.075},
+		{name:"Y",oxidation:3,coor:6,only_spin:0.9},
+		{name:"Y",oxidation:3,coor:7,only_spin:0.96},
+		{name:"Fe",oxidation:2,coor:8,only_spin:0.92},
+		{name:"Fe",oxidation:2,coor:4,only_spin:0.63},
+		{name:"Fe",oxidation:2,coor:6,only_spin:0.78},
+		{name:"Fe",oxidation:3,coor:8,only_spin:0.78},
+		{name:"Fe",oxidation:3,coor:4,only_spin:0.49},
+		{name:"Fe",oxidation:3,coor:5,only_spin:0.58},
+		{name:"Fe",oxidation:3,coor:6,only_spin:0.645},
+		{name:"Fe",oxidation:4,coor:6,only_spin:0.585},
+		{name:"Fe",oxidation:6,coor:4,only_spin:0.25},
+		{name:"V",oxidation:2,coor:6,only_spin:0.79},
+		{name:"V",oxidation:3,coor:6,only_spin:0.64},
+		{name:"V",oxidation:4,coor:8,only_spin:0.72},
+		{name:"V",oxidation:4,coor:5,only_spin:0.53},
+		{name:"V",oxidation:4,coor:6,only_spin:0.58},
+		{name:"V",oxidation:5,coor:4,only_spin:0.355},
+		{name:"V",oxidation:5,coor:5,only_spin:0.46},
+		{name:"V",oxidation:5,coor:6,only_spin:0.54},
+		{name:"Ra",oxidation:2,coor:8,only_spin:1.48},
+		{name:"Ra",oxidation:2,coor:12,only_spin:1.7},
+		{name:"Co",oxidation:2,coor:8,only_spin:0.9},
+		{name:"Co",oxidation:2,coor:4,only_spin:0.58},
+		{name:"Co",oxidation:2,coor:5,only_spin:0.67},
+		{name:"Co",oxidation:2,coor:6,only_spin:0.745},
+		{name:"Co",oxidation:3,coor:6,only_spin:0.61},
+		{name:"Co",oxidation:4,coor:4,only_spin:0.4},
+		{name:"Co",oxidation:4,coor:6,only_spin:0.53},
+		{name:"Ir",oxidation:3,coor:6,only_spin:0.68},
+		{name:"Ir",oxidation:4,coor:6,only_spin:0.625},
+		{name:"Ir",oxidation:5,coor:6,only_spin:0.57},
+		{name:"In",oxidation:3,coor:8,only_spin:0.92},
+		{name:"In",oxidation:3,coor:4,only_spin:0.62},
+		{name:"In",oxidation:3,coor:6,only_spin:0.8},
+		{name:"C",oxidation:4,coor:3,only_spin:-0.08},
+		{name:"C",oxidation:4,coor:4,only_spin:0.15},
+		{name:"C",oxidation:4,coor:6,only_spin:0.16},
+		{name:"No",oxidation:2,coor:6,only_spin:1.1},
+		{name:"Np",oxidation:2,coor:6,only_spin:1.1},
+		{name:"Np",oxidation:3,coor:6,only_spin:1.01},
+		{name:"Np",oxidation:4,coor:8,only_spin:0.98},
+		{name:"Np",oxidation:4,coor:6,only_spin:0.87},
+		{name:"Np",oxidation:5,coor:6,only_spin:0.75},
+		{name:"Np",oxidation:6,coor:6,only_spin:0.72},
+		{name:"Np",oxidation:7,coor:6,only_spin:0.71},
+		{name:"F",oxidation:-1,coor:2,only_spin:1.285},
+		{name:"F",oxidation:-1,coor:3,only_spin:1.3},
+		{name:"F",oxidation:-1,coor:4,only_spin:1.31},
+		{name:"F",oxidation:-1,coor:6,only_spin:1.33},
+		{name:"F",oxidation:7,coor:6,only_spin:0.08},
+		{name:"Li",oxidation:1,coor:8,only_spin:0.92},
+		{name:"Li",oxidation:1,coor:4,only_spin:0.59},
+		{name:"Li",oxidation:1,coor:6,only_spin:0.76},
+		{name:"Lu",oxidation:3,coor:8,only_spin:0.977},
+		{name:"Lu",oxidation:3,coor:9,only_spin:1.032},
+		{name:"Lu",oxidation:3,coor:6,only_spin:0.861},
+		{name:"Se",oxidation:4,coor:6,only_spin:0.5},
+		{name:"Se",oxidation:6,coor:4,only_spin:0.28},
+		{name:"Se",oxidation:6,coor:6,only_spin:0.42},
+		{name:"Se",oxidation:-2,coor:6,only_spin:1.98},
+		{name:"Gd",oxidation:3,coor:8,only_spin:1.053},
+		{name:"Gd",oxidation:3,coor:9,only_spin:1.107},
+		{name:"Gd",oxidation:3,coor:6,only_spin:0.938},
+		{name:"Gd",oxidation:3,coor:7,only_spin:1},
+		{name:"Br",oxidation:3,coor:4,only_spin:0.59},
+		{name:"Br",oxidation:5,coor:3,only_spin:0.31},
+		{name:"Br",oxidation:-1,coor:6,only_spin:1.96},
+		{name:"Br",oxidation:7,coor:4,only_spin:0.25},
+		{name:"Br",oxidation:7,coor:6,only_spin:0.39},
+		{name:"Mg",oxidation:2,coor:8,only_spin:0.89},
+		{name:"Mg",oxidation:2,coor:4,only_spin:0.57},
+		{name:"Mg",oxidation:2,coor:5,only_spin:0.66},
+		{name:"Mg",oxidation:2,coor:6,only_spin:0.72},
+		{name:"Ti",oxidation:2,coor:6,only_spin:0.86},
+		{name:"Ti",oxidation:3,coor:6,only_spin:0.67},
+		{name:"Ti",oxidation:4,coor:8,only_spin:0.74},
+		{name:"Ti",oxidation:4,coor:4,only_spin:0.42},
+		{name:"Ti",oxidation:4,coor:5,only_spin:0.51},
+		{name:"Ti",oxidation:4,coor:6,only_spin:0.605},
+		{name:"Mn",oxidation:2,coor:8,only_spin:0.96},
+		{name:"Mn",oxidation:2,coor:4,only_spin:0.66},
+		{name:"Mn",oxidation:2,coor:5,only_spin:0.75},
+		{name:"Mn",oxidation:2,coor:6,only_spin:0.83},
+		{name:"Mn",oxidation:2,coor:7,only_spin:0.9},
+		{name:"Mn",oxidation:3,coor:5,only_spin:0.58},
+		{name:"Mn",oxidation:3,coor:6,only_spin:0.645},
+		{name:"Mn",oxidation:4,coor:4,only_spin:0.39},
+		{name:"Mn",oxidation:4,coor:6,only_spin:0.53},
+		{name:"Mn",oxidation:5,coor:4,only_spin:0.33},
+		{name:"Mn",oxidation:6,coor:4,only_spin:0.255},
+		{name:"Mn",oxidation:7,coor:4,only_spin:0.25},
+		{name:"Mn",oxidation:7,coor:6,only_spin:0.46},
+		{name:"Zr",oxidation:4,coor:4,only_spin:0.59},
+		{name:"Zr",oxidation:4,coor:5,only_spin:0.66},
+		{name:"Zr",oxidation:4,coor:6,only_spin:0.72},
+		{name:"Zr",oxidation:4,coor:7,only_spin:0.78},
+		{name:"Zr",oxidation:4,coor:8,only_spin:0.84},
+		{name:"Zr",oxidation:4,coor:9,only_spin:0.89},
+		{name:"Tb",oxidation:3,coor:8,only_spin:1.04},
+		{name:"Tb",oxidation:3,coor:9,only_spin:1.095},
+		{name:"Tb",oxidation:3,coor:6,only_spin:0.923},
+		{name:"Tb",oxidation:3,coor:7,only_spin:0.98},
+		{name:"Tb",oxidation:4,coor:8,only_spin:0.88},
+		{name:"Tb",oxidation:4,coor:6,only_spin:0.76},
+		{name:"Pr",oxidation:3,coor:8,only_spin:1.126},
+		{name:"Pr",oxidation:3,coor:9,only_spin:1.179},
+		{name:"Pr",oxidation:3,coor:6,only_spin:0.99},
+		{name:"Pr",oxidation:4,coor:8,only_spin:0.96},
+		{name:"Pr",oxidation:4,coor:6,only_spin:0.85},
+		{name:"Sc",oxidation:3,coor:8,only_spin:0.87},
+		{name:"Sc",oxidation:3,coor:6,only_spin:0.745},
+		{name:"B",oxidation:3,coor:3,only_spin:0.01},
+		{name:"B",oxidation:3,coor:4,only_spin:0.11},
+		{name:"B",oxidation:3,coor:6,only_spin:0.27},
+		{name:"Am",oxidation:2,coor:8,only_spin:1.26},
+		{name:"Am",oxidation:2,coor:9,only_spin:1.31},
+		{name:"Am",oxidation:2,coor:7,only_spin:1.21},
+		{name:"Am",oxidation:3,coor:8,only_spin:1.09},
+		{name:"Am",oxidation:3,coor:6,only_spin:0.975},
+		{name:"Am",oxidation:4,coor:8,only_spin:0.95},
+		{name:"Am",oxidation:4,coor:6,only_spin:0.85},
+		{name:"Bk",oxidation:3,coor:6,only_spin:0.96},
+		{name:"Bk",oxidation:4,coor:8,only_spin:0.93},
+		{name:"Bk",oxidation:4,coor:6,only_spin:0.83},
+		{name:"Re",oxidation:4,coor:6,only_spin:0.63},
+		{name:"Re",oxidation:5,coor:6,only_spin:0.58},
+		{name:"Re",oxidation:6,coor:6,only_spin:0.55},
+		{name:"Re",oxidation:7,coor:4,only_spin:0.38},
+		{name:"Re",oxidation:7,coor:6,only_spin:0.53},
+		{name:"Te",oxidation:4,coor:3,only_spin:0.52},
+		{name:"Te",oxidation:4,coor:4,only_spin:0.66},
+		{name:"Te",oxidation:4,coor:6,only_spin:0.97},
+		{name:"Te",oxidation:6,coor:4,only_spin:0.43},
+		{name:"Te",oxidation:6,coor:6,only_spin:0.56},
+		{name:"Te",oxidation:-2,coor:6,only_spin:2.21},
+		{name:"Pm",oxidation:3,coor:8,only_spin:1.093},
+		{name:"Pm",oxidation:3,coor:9,only_spin:1.144},
+		{name:"Pm",oxidation:3,coor:6,only_spin:0.97},
+		{name:"As",oxidation:3,coor:6,only_spin:0.58},
+		{name:"As",oxidation:5,coor:4,only_spin:0.335},
+		{name:"As",oxidation:5,coor:6,only_spin:0.46},
+		{name:"Pd",oxidation:1,coor:2,only_spin:0.59},
+		{name:"Pd",oxidation:2,coor:4,only_spin:0.64},
+		{name:"Pd",oxidation:2,coor:6,only_spin:0.86},
+		{name:"Pd",oxidation:3,coor:6,only_spin:0.76},
+		{name:"Pd",oxidation:4,coor:6,only_spin:0.615},
+		{name:"Si",oxidation:4,coor:4,only_spin:0.26},
+		{name:"Si",oxidation:4,coor:6,only_spin:0.4},
+		{name:"W",oxidation:4,coor:6,only_spin:0.66},
+		{name:"W",oxidation:5,coor:6,only_spin:0.62},
+		{name:"W",oxidation:6,coor:4,only_spin:0.42},
+		{name:"W",oxidation:6,coor:5,only_spin:0.51},
+		{name:"W",oxidation:6,coor:6,only_spin:0.6},
+		{name:"Cf",oxidation:3,coor:6,only_spin:0.95},
+		{name:"Cf",oxidation:4,coor:8,only_spin:0.92},
+		{name:"Cf",oxidation:4,coor:6,only_spin:0.821},
+		{name:"Ag",oxidation:1,coor:2,only_spin:0.67},
+		{name:"Ag",oxidation:1,coor:4,only_spin:1},
+		{name:"Ag",oxidation:1,coor:5,only_spin:1.09},
+		{name:"Ag",oxidation:1,coor:6,only_spin:1.15},
+		{name:"Ag",oxidation:1,coor:7,only_spin:1.22},
+		{name:"Ag",oxidation:1,coor:8,only_spin:1.28},
+		{name:"Ag",oxidation:2,coor:4,only_spin:0.79},
+		{name:"Ag",oxidation:2,coor:6,only_spin:0.94},
+		{name:"Ag",oxidation:3,coor:4,only_spin:0.67},
+		{name:"Ag",oxidation:3,coor:6,only_spin:0.75},
+		{name:"Tm",oxidation:2,coor:6,only_spin:1.03},
+		{name:"Tm",oxidation:2,coor:7,only_spin:1.09},
+		{name:"Tm",oxidation:3,coor:8,only_spin:0.994},
+		{name:"Tm",oxidation:3,coor:9,only_spin:1.052},
+		{name:"Tm",oxidation:3,coor:6,only_spin:0.88},
+		{name:"At",oxidation:7,coor:6,only_spin:0.62},
+		{name:"Dy",oxidation:2,coor:8,only_spin:1.19},
+		{name:"Dy",oxidation:2,coor:6,only_spin:1.07},
+		{name:"Dy",oxidation:2,coor:7,only_spin:1.13},
+		{name:"Dy",oxidation:3,coor:8,only_spin:1.027},
+		{name:"Dy",oxidation:3,coor:9,only_spin:1.083},
+		{name:"Dy",oxidation:3,coor:6,only_spin:0.912},
+		{name:"Dy",oxidation:3,coor:7,only_spin:0.97},
+		{name:"Zn",oxidation:2,coor:8,only_spin:0.9},
+		{name:"Zn",oxidation:2,coor:4,only_spin:0.6},
+		{name:"Zn",oxidation:2,coor:5,only_spin:0.68},
+		{name:"Zn",oxidation:2,coor:6,only_spin:0.74},
+		{name:"Na",oxidation:1,coor:4,only_spin:0.99},
+		{name:"Na",oxidation:1,coor:5,only_spin:1},
+		{name:"Na",oxidation:1,coor:6,only_spin:1.02},
+		{name:"Na",oxidation:1,coor:7,only_spin:1.12},
+		{name:"Na",oxidation:1,coor:8,only_spin:1.18},
+		{name:"Na",oxidation:1,coor:9,only_spin:1.24},
+		{name:"Na",oxidation:1,coor:12,only_spin:1.39},
+		{name:"Hg",oxidation:1,coor:3,only_spin:0.97},
+		{name:"Hg",oxidation:1,coor:6,only_spin:1.19},
+		{name:"Hg",oxidation:2,coor:8,only_spin:1.14},
+		{name:"Hg",oxidation:2,coor:2,only_spin:0.69},
+		{name:"Hg",oxidation:2,coor:4,only_spin:0.96},
+		{name:"Hg",oxidation:2,coor:6,only_spin:1.02},
+		{name:"D",oxidation:1,coor:2,only_spin:-0.1},
+		{name:"Cu",oxidation:1,coor:2,only_spin:0.46},
+		{name:"Cu",oxidation:1,coor:4,only_spin:0.6},
+		{name:"Cu",oxidation:1,coor:6,only_spin:0.77},
+		{name:"Cu",oxidation:2,coor:4,only_spin:0.57},
+		{name:"Cu",oxidation:2,coor:5,only_spin:0.65},
+		{name:"Cu",oxidation:2,coor:6,only_spin:0.73},
+		{name:"Cu",oxidation:3,coor:6,only_spin:0.54},
+		{name:"Pb",oxidation:2,coor:4,only_spin:0.98},
+		{name:"Pb",oxidation:2,coor:6,only_spin:1.19},
+		{name:"Pb",oxidation:2,coor:7,only_spin:1.23},
+		{name:"Pb",oxidation:2,coor:8,only_spin:1.29},
+		{name:"Pb",oxidation:2,coor:9,only_spin:1.35},
+		{name:"Pb",oxidation:2,coor:10,only_spin:1.4},
+		{name:"Pb",oxidation:2,coor:11,only_spin:1.45},
+		{name:"Pb",oxidation:2,coor:12,only_spin:1.49},
+		{name:"Pb",oxidation:4,coor:8,only_spin:0.94},
+		{name:"Pb",oxidation:4,coor:4,only_spin:0.65},
+		{name:"Pb",oxidation:4,coor:5,only_spin:0.73},
+		{name:"Pb",oxidation:4,coor:6,only_spin:0.775},
+		{name:"Er",oxidation:3,coor:8,only_spin:1.004},
+		{name:"Er",oxidation:3,coor:9,only_spin:1.062},
+		{name:"Er",oxidation:3,coor:6,only_spin:0.89},
+		{name:"Er",oxidation:3,coor:7,only_spin:0.945},
+	]
+
+function update_A_elements(){
+	var opt = "";
+	var unique_names = [];
+	var unique = true;
+	var match = false;
+	var num = parseInt(document.getElementById("A_oxidation").value);
+	for(var i = 0; i < elements.length; i++){
+		for(var j = 0; j < unique_names.length; j++){
+			if(elements[i].name === unique_names[j]){
+				unique = false;
+			}
+		}
+		if(elements[i].oxidation === num){
+			match = true;
+		}
+		if(unique === true && match === true){
+			opt += '<option value="'+elements[i].name+'">'+elements[i].name+"</option>";
+			unique_names.push(elements[i].name);
+		}
+		unique = true;
+		match = false;
 	}
+	document.getElementById("A_element").innerHTML = opt;
+}
+
+function update_B_elements(){
+	var opt = "";
+	var unique_names = [];
+	var unique = true;
+	var match = false;
+	var num = parseInt(document.getElementById("B_oxidation").value);
+	for(var i = 0; i < elements.length; i++){
+		for(var j = 0; j < unique_names.length; j++){
+			if(elements[i].name === unique_names[j]){
+				unique = false;
+			}
+		}
+		if(elements[i].oxidation === num){
+			match = true;
+		}
+		if(unique === true && match === true){
+			opt += '<option value="'+elements[i].name+'">'+elements[i].name+"</option>";
+			unique_names.push(elements[i].name);
+		}
+		unique = true;
+		match = false;
+	}
+	document.getElementById("B_element").innerHTML = opt;
+
+}
+
+function update_X_elements(){
+	var opt = "";
+	var unique_names = [];
+	var unique = true;
+	var match = false;
+	var num = parseInt(document.getElementById("X_oxidation").value);
+	for(var i = 0; i < elements.length; i++){
+		for(var j = 0; j < unique_names.length; j++){
+			if(elements[i].name === unique_names[j]){
+				unique = false;
+			}
+		}
+		if(elements[i].oxidation === num){
+			match = true;
+		}
+		if(unique === true && match === true){
+			opt += '<option value="'+elements[i].name+'">'+elements[i].name+"</option>";
+			unique_names.push(elements[i].name);
+		}
+		unique = true;
+		match = false;
+	}
+	document.getElementById("X_element").innerHTML = opt;
+
+}
+
+function formula(A, B, C){
+	var in_oxA = 1;
+	var eff_tA = A;
+	var eff_tB = B;
+	var eff_tX = C;
+
+	var tmp_ratio1 = eff_tA/eff_tB;
+	var tmp_ratio2 = eff_tX/eff_tB;
+	var tmp_tau = tmp_ratio2-in_oxA*(in_oxA-(tmp_ratio1/Math.log(tmp_ratio1)));
+	return tmp_tau;
+}
+
+function calculate(){
+	var A_name = document.getElementById("A_element").value;
+	var B_name = document.getElementById("B_element").value;
+	var X_name = document.getElementById("X_element").value;
+	var A_oxid = parseInt(document.getElementById("A_oxidation").value);
+	var B_oxid = parseInt(document.getElementById("B_oxidation").value);
+	var X_oxid = parseInt(document.getElementById("X_oxidation").value);
+
+	var num = 12;
+
+	var a_dst = 50;
+	var b_dst = 50;
+	var x_dst = 50; 
+
+	var A = 0;
+	var B = 0;
+	var X = 0;
+
+	var rel_dst_A = 50;
+	var rel_dst_B = 50;
+	var rel_dst_X = 50;
+
+	var A_spin = 0;
+	var B_spin = 0;
+	var X_spin = 0;
+
+	for(var i = 0; i < elements.length; i++){
+		if(A_name === elements[i].name && A_oxid === elements[i].oxidation){
+			rel_dst_A = Math.abs(parseInt(elements[i].coor) - num);					
+			if(rel_dst_A < a_dst){
+				A = parseInt(elements[i].coor);
+				a_dst = rel_dst_A;
+				A_spin = parseFloat(elements[i].only_spin);
+			}	
+		}
+		if(B_name === elements[i].name && B_oxid === elements[i].oxidation){
+			rel_dst_B = Math.abs(parseInt(elements[i].coor) - num);					
+			if(rel_dst_B < b_dst){
+				B = parseInt(elements[i].coor);
+				b_dst = rel_dst_B;
+				B_spin = parseFloat(elements[i].only_spin);
+			}	
+		}
+		if(X_name === elements[i].name && X_oxid === elements[i].oxidation){
+			rel_dst_X = Math.abs(parseInt(elements[i].coor) - num);					
+			if(rel_dst_X < x_dst){
+				X = parseInt(elements[i].coor);
+				x_dst = rel_dst_X;
+				X_spin = parseFloat(elements[i].only_spin);
+			}	
+		}
+	}
+	return(A_name + " coordination=" + A + "<br>" + B_name + " coordination=" + B + "<br>" + X_name + " coordination=" + X + "<br>tmp_tau=" + formula(A_spin,B_spin,X_spin));
+}
+
 </script>
 
-</head>
-<body>
-A<input type="number" id="a" value="70"><br>
-B<input type="number" id="b" value="65"><br>
-X<input type="number" id="x" value="60"><br>
+A <select id="A_element">
+</select>
+Oxidation State
+<select onchange="update_A_elements()" id="A_oxidation">
+	<option value=-2>-2</option>
+	<option value=-1>-1</option>
+	<option value=1>1</option>
+	<option value=2>2</option>
+	<option value=3>3</option>
+	<option value=4>4</option>
+	<option value=5>5</option>
+	<option value=6>6</option>
+	<option value=7>7</option>
+	<option value=8>8</option>
+</select>
+<br>
+B <select id="B_element">
+</select>
+Oxidation State
+<select onchange="update_B_elements()" id="B_oxidation">
+	<option value=-2">-2</option>
+	<option value=-1">-1</option>
+	<option value=1">1</option>
+	<option value=2">2</option>
+	<option value=3">3</option>
+	<option value=4">4</option>
+	<option value=5">5</option>
+	<option value=6">6</option>
+	<option value=7">7</option>
+	<option value=8">8</option>
+</select>
+<br>
+X <select id="X_element">
+	<option value="N">N</option>
+	<option value="S">S</option>
+	<option value="Se">Se</option>
+	<option value="O">O</option>
+	<option value="F">F</option>
+	<option value="Cl">Cl</option>
+	<option value="Br">Br</option>
+	<option value="I">I</option>
+</select>
+Oxidation State
+<select onchange="update_X_elements()" id="X_oxidation">
+	<option value=-2">-2</option>
+	<option value=-1">-1</option>
+	<option value=1">1</option>
+	<option value=2">2</option>
+	<option value=3">3</option>
+	<option value=4">4</option>
+	<option value=5">5</option>
+	<option value=6">6</option>
+	<option value=7">7</option>
+	<option value=8">8</option>
+</select>
+<br><br>
 <button type="button" onclick="document.getElementById('output').innerHTML = calculate()">Run</button>
 <br><br>
-Result
 <p id="output"></p>
+
+<script>
+update_A_elements()
+update_B_elements()
+update_X_elements()
+</script>
+
 </body>
-</html> 
+</html>
+
+
